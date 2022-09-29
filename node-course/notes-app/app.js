@@ -18,7 +18,7 @@ yargs.command({
     }
   },
   // eslint-disable-next-line func-names, object-shorthand
-  handler: (argv) => {
+  handler(argv) {
     notesUtils.addNote(argv.title, argv.body);
   }
 });
@@ -35,7 +35,7 @@ yargs.command({
     }
   },
   // eslint-disable-next-line func-names, object-shorthand
-  handler: (argv) => {
+  handler(argv) {
     notesUtils.removeNote(argv.title);
   }
 });
@@ -45,16 +45,24 @@ yargs.command({
   command: 'list',
   describe: 'Lists all notes',
   // eslint-disable-next-line func-names, object-shorthand
-  handler: () => { }
+  handler() {
+    notesUtils.getNotes();
+  }
 });
 
 // Create read command
 yargs.command({
   command: 'read',
   describe: 'Reads note',
-  // eslint-disable-next-line func-names, object-shorthand
-  handler: () => {
-    console.log('Adding new message');
+  builder: {
+    title: {
+      describe: 'Note title',
+      demandOption: true,
+      type: 'string'
+    }
+  },
+  handler(argv) {
+    notesUtils.readNote(argv.title);
   }
 });
 // eslint-disable-next-line no-unused-expressions

@@ -1,4 +1,5 @@
 const fs = require('fs');
+const logUtils = require('./logging');
 
 const storageFile = 'notes.json';
 
@@ -20,12 +21,16 @@ const listNotes = () => {
 const addNote = (title, body) => {
   const notes = listNotes();
   if (title in notes) {
-    console.log(`Choose another title. Title ${title} already exists`);
+    logUtils.logFailure(
+      `Choose another title. Note with title "${title}" already exists`
+    );
     return;
   }
   notes[title] = body;
   saveNotes(notes);
-  console.log('New note has been added successfully!');
+  logUtils.logSuccess(
+    `New note with title "${title}" has been added successfully!`
+  );
 };
 
 const removeNote = (title) => {
@@ -33,12 +38,30 @@ const removeNote = (title) => {
   if (title in notes) {
     delete notes[title];
     saveNotes(notes);
-    console.log(
-      `The note with the title ${title} has been successfully deleted`
+    logUtils.logSuccess(
+      `The note with the title "${title}" has been successfully deleted`
     );
   } else {
-    console.log(`The note with the title ${title} has not been found`);
+    logUtils.logFailure(
+      `The note with the title "${title}" has not been found`
+    );
   }
 };
 
-module.exports = { addNote, listNotes, removeNote };
+const getNotes = () => {
+  const notes = listNotes();
+  if (Object.keys(notes).length === 0) {
+    logUtils.logFailure('No notes yet');
+  }
+  logUtils.logSuccess('Your notes');
+  Object.keys(notes).forEach((key) => logUtils.logNeutral(key));
+};
+
+const readNote = (title) => {
+  const notes = listNotes();
+  const note = notes[title];
+  if (note) logUtils.logNeutral(note);
+  else logUtils.logFailure(`The note with title "${title}" doesn't exist`);
+};
+
+module.exports = { addNote, listNotes, removeNote, getNotes, readNote };
