@@ -1,5 +1,5 @@
-/* eslint-disable prettier/prettier */
 const yargs = require('yargs');
+const notesUtils = require('./notes');
 
 // Create add command
 yargs.command({
@@ -15,11 +15,11 @@ yargs.command({
       describe: 'Note content',
       demandOption: true,
       type: 'string'
-    },
+    }
   },
   // eslint-disable-next-line func-names, object-shorthand
   handler: (argv) => {
-    console.log(`${argv.title} : ${argv.body}`);
+    notesUtils.addNote(argv.title, argv.body);
   }
 });
 
@@ -27,9 +27,16 @@ yargs.command({
 yargs.command({
   command: 'remove',
   describe: 'Removes note',
+  builder: {
+    title: {
+      describe: 'Note title',
+      demandOption: true,
+      type: 'string'
+    }
+  },
   // eslint-disable-next-line func-names, object-shorthand
-  handler: () => {
-    console.log('Adding new message');
+  handler: (argv) => {
+    notesUtils.removeNote(argv.title);
   }
 });
 
@@ -38,9 +45,7 @@ yargs.command({
   command: 'list',
   describe: 'Lists all notes',
   // eslint-disable-next-line func-names, object-shorthand
-  handler: () => {
-    console.log('Adding new message');
-  }
+  handler: () => { }
 });
 
 // Create read command
@@ -52,4 +57,5 @@ yargs.command({
     console.log('Adding new message');
   }
 });
-console.log(yargs.argv)
+// eslint-disable-next-line no-unused-expressions
+yargs.argv;
