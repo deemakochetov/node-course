@@ -15,7 +15,10 @@ const getGeocoding = (loc, callback) => {
       }
     })
     .catch(() => {
-      callback('Unable to connect to location services', undefined);
+      callback(
+        'Unable to connect to location services, try another location',
+        undefined
+      );
     })
     .then(() => {
       // always executed

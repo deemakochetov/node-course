@@ -7,21 +7,24 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
     crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 
-<body>
+<body class="text-center">
   <p class="fw-light fs-2">Type your location to get the current weather</p>
-  <form>
+  <form method="post" action="/location" style="padding-left: 20%; padding-right: 20%">
     <div class="mb-3">
       <label for="locationInput" class="form-label">Your location</label>
-      <input type="text" class="form-control" id="locationaImport">
+      <input type="text" class="form-control" id="locationaImport" name="location">
     </div>
     <div class="mb-3 form-check">
-      <input type="checkbox" class="form-check-input" id="geoCheck">
+      <input type="checkbox" class="form-check-input" id="geoCheck" name="needGeocoding">
       <label class="form-check-label" for="geoCheck">Get exact location</label>
     </div>
     <button type="submit" class="btn btn-primary">Tell me the weather</button>
   </form>
+  {{>footer}}
+
 </body>
 
 </html>
