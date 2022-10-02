@@ -7,6 +7,7 @@ const { log, logFailure, logSuccess } = require('./utils/logging');
 const getWeather = require('./utils/weather');
 const getGeocoding = require('./utils/geocoding');
 
+const port = process.env.PORT || 3000;
 const app = express();
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -55,6 +56,6 @@ app.get('/location', (req, res) => {
   res.render('getLocation');
 });
 
-app.listen(3000, () => {
-  logSuccess('App is running on 3000 port');
+app.listen(port, () => {
+  logSuccess(`App is running on ${port} port`);
 });
