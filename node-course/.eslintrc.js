@@ -13,6 +13,10 @@ module.exports = {
   },
   rules: {
     'prettier/prettier': ['error'],
-    'no-console': 'off'
+    'no-console': 'off',
+    'no-restricted-syntax': ['error', 'LabeledStatement', 'WithStatement'],
+    'no-plusplus': 'off',
+    'no-use-before-define': ['error', { functions: false, classes: false }],
+    'no-param-reassign': 0
   }
 };

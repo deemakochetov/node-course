@@ -21,5 +21,4 @@ const getGeocoding = (loc, callback) => {
       // always executed
     });
 };
-
 module.exports = getGeocoding;
