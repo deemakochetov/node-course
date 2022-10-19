@@ -1,11 +1,11 @@
 const { MongoClient, ObjectId } = require('mongodb');
 const { logFailure, logSuccess, log } = require('./utils/logging');
 
-const connenctionURL = 'mongodb://127.0.0.1:27017';
-const databaseName = 'task-manager';
+const CONNECTION_URL = 'mongodb://127.0.0.1:27017';
+const DATABASE_NAME = 'task-manager';
 
 MongoClient.connect(
-  connenctionURL,
+  CONNECTION_URL,
   {
     useNewUrlParser: true
   },
@@ -14,7 +14,7 @@ MongoClient.connect(
       return logFailure('Unable to connect to database');
     }
 
-    const db = client.db(databaseName);
+    const db = client.db(DATABASE_NAME);
     db.collection('users').insertOne(
       {
         name: 'Dima',
