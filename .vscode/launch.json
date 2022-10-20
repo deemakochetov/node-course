@@ -5,6 +5,15 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Task Manager",
+      "program": "${workspaceFolder}/node-course/task-manager/src/index.js",
+      "request": "launch",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "node"
+    },
+    {
       "name": "Launch Playground",
       "program": "${workspaceFolder}/node-course/playground/exercise.js",
       "request": "launch",
