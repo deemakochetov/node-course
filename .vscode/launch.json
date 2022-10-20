@@ -6,7 +6,7 @@
   "configurations": [
     {
       "name": "Launch Task Manager",
-      "program": "${workspaceFolder}/node-course/task-manager/src/index.js",
+      "program": "${workspaceFolder}/node-course/task-manager/index.js",
       "request": "launch",
       "skipFiles": [
         "<node_internals>/**"
