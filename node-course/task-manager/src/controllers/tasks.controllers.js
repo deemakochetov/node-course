@@ -3,9 +3,18 @@ const { StatusCodes } = require('http-status-codes');
 const Task = require('../models/task');
 
 const createTask = async (req, res) => {
-  try {
-    const task = new Task(req.body);
+  const allowedFields = ['description', 'completed'];
 
+  try {
+    const queryObject = {};
+    for (const [key, value] of Object.entries(req.body)) {
+      if (allowedFields.includes(key)) queryObject[key] = value;
+      else
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .send({ error: 'Invalid parameters' });
+    }
+    const task = new Task(queryObject);
     await task.save();
     res.status(StatusCodes.CREATED).send(task);
   } catch (err) {
@@ -31,18 +40,28 @@ const getAllTasks = async (req, res) => {
 const getTask = async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
-    res.send(task);
+    if (!task) res.status(StatusCodes.NOT_FOUND).send();
+    else res.send(task);
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send(err);
   }
 };
 
 const updateTask = async (req, res) => {
+  const allowedUpdates = ['description', 'completed'];
+
   try {
     const task = await Task.findById(req.params.id);
-    const data = req.body;
-    for (const [key, value] of Object.entries(data)) {
-      task[key] = value;
+    if (!task) {
+      res.status(StatusCodes.NOT_FOUND).send();
+      return;
+    }
+    for (const [key, value] of Object.entries(req.body)) {
+      if (allowedUpdates.includes(key)) task[key] = value;
+      else
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .send({ error: 'Invalid parameters' });
     }
     await task.save();
     res.send(task);
@@ -53,10 +72,11 @@ const updateTask = async (req, res) => {
 
 const deleteTask = async (req, res) => {
   try {
-    await Task.deleteOne({
+    const result = await Task.deleteOne({
       _id: req.params.id
     });
-    res.send();
+    if (result.deletedCount === 0) res.status(StatusCodes.NOT_FOUND).send();
+    else res.send();
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send(err);
   }
