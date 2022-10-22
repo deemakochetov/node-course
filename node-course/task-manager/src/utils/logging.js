@@ -8,8 +8,8 @@ const logFailure = (message) => {
   console.log(chalk.red(message));
 };
 
-const logNeutral = (message) => {
+const log = (message) => {
   console.log(message);
 };
 
-module.exports = { logFailure, logSuccess, logNeutral };
+module.exports = { logFailure, logSuccess, log };

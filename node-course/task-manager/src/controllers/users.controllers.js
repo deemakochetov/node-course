@@ -1,4 +1,5 @@
 const { StatusCodes } = require('http-status-codes');
+const bcrypt = require('bcryptjs');
 
 const User = require('../models/user');
 
@@ -14,11 +15,24 @@ const createUser = async (req, res) => {
           .send({ error: 'Invalid parameters' });
     }
     const user = new User(queryObject);
-
     await user.save();
-    res.status(StatusCodes.CREATED).send(user);
+    const token = await user.generateAuthToken();
+    res.status(StatusCodes.CREATED).send({ user, token });
   } catch (err) {
-    res.status(StatusCodes.BAD_REQUEST).send(err);
+    res.status(StatusCodes.BAD_REQUEST).send({ error: err.message });
+  }
+};
+
+const loginUser = async (req, res) => {
+  try {
+    const user = await User.findByCredentials(
+      req.body.email,
+      req.body.password
+    );
+    const token = user.generateAuthToken();
+    res.send({ user, token });
+  } catch (err) {
+    res.status(StatusCodes.BAD_REQUEST).send({ error: err.message });
   }
 };
 
@@ -67,4 +81,4 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser, updateUser, deleteUser, getUser };
+module.exports = { createUser, updateUser, deleteUser, getUser, loginUser };
