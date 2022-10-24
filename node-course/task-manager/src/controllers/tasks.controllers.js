@@ -14,6 +14,7 @@ const createTask = async (req, res) => {
           .status(StatusCodes.BAD_REQUEST)
           .send({ error: 'Invalid parameters' });
     }
+    queryObject.owner = req.user._id;
     const task = new Task(queryObject);
     await task.save();
     res.status(StatusCodes.CREATED).send(task);
@@ -30,6 +31,7 @@ const getAllTasks = async (req, res) => {
         completed: req.query.completed
       };
     }
+    searchQuery.owner = req.user._id;
     const tasks = await Task.find(searchQuery);
     res.send(tasks);
   } catch (err) {
@@ -41,6 +43,7 @@ const getTask = async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
     if (!task) res.status(StatusCodes.NOT_FOUND).send();
+    if (task.owner !== req.user._id) res.status(StatusCodes.FORBIDDEN).send();
     else res.send(task);
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send(err);
@@ -56,6 +59,7 @@ const updateTask = async (req, res) => {
       res.status(StatusCodes.NOT_FOUND).send();
       return;
     }
+    if (task.owner !== req.user._id) res.status(StatusCodes.FORBIDDEN).send();
     for (const [key, value] of Object.entries(req.body)) {
       if (allowedUpdates.includes(key)) task[key] = value;
       else
@@ -73,7 +77,8 @@ const updateTask = async (req, res) => {
 const deleteTask = async (req, res) => {
   try {
     const result = await Task.deleteOne({
-      _id: req.params.id
+      _id: req.params.id,
+      owner: req.user._id
     });
     if (result.deletedCount === 0) res.status(StatusCodes.NOT_FOUND).send();
     else res.send();

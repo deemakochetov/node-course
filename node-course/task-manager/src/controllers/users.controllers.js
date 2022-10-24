@@ -1,5 +1,4 @@
 const { StatusCodes } = require('http-status-codes');
-const bcrypt = require('bcryptjs');
 
 const User = require('../models/user');
 
@@ -29,21 +28,35 @@ const loginUser = async (req, res) => {
       req.body.email,
       req.body.password
     );
-    const token = user.generateAuthToken();
+    const token = await user.generateAuthToken();
     res.send({ user, token });
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send({ error: err.message });
   }
 };
 
+const getUser = async (req, res) => {
+  try {
+    res.send(req.user);
+  } catch (err) {
+    res.status(StatusCodes.BAD_REQUEST).send(err);
+  }
+};
+
+const deleteUser = async (req, res) => {
+  try {
+    const result = await User.deleteOne(req.user);
+    if (result.deletedCount === 0) res.status(StatusCodes.NOT_FOUND).send();
+    else res.send();
+  } catch (err) {
+    res.status(StatusCodes.BAD_REQUEST).send(err);
+  }
+};
+
 const updateUser = async (req, res) => {
   const allowedUpdates = ['name', 'age', 'email', 'password'];
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      res.status(StatusCodes.NOT_FOUND).send();
-      return;
-    }
+    const { user } = req;
     const data = req.body;
     for (const [key, value] of Object.entries(data)) {
       if (allowedUpdates.includes(key)) user[key] = value;
@@ -59,26 +72,34 @@ const updateUser = async (req, res) => {
   }
 };
 
-const getUser = async (req, res) => {
+const logoutUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) res.status(StatusCodes.NOT_FOUND).send();
-    else res.send(user);
+    const { user } = req;
+    user.tokens = user.tokens.filter((token) => token.token !== req.token);
+    await user.save();
+    res.send();
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send(err);
   }
 };
 
-const deleteUser = async (req, res) => {
+const logoutUserSessions = async (req, res) => {
   try {
-    const result = await User.deleteOne({
-      _id: req.params.id
-    });
-    if (result.deletedCount === 0) res.status(StatusCodes.NOT_FOUND).send();
-    else res.send();
+    const { user } = req;
+    user.tokens = [];
+    await user.save();
+    res.send();
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send(err);
   }
 };
 
-module.exports = { createUser, updateUser, deleteUser, getUser, loginUser };
+module.exports = {
+  createUser,
+  loginUser,
+  getUser,
+  deleteUser,
+  updateUser,
+  logoutUser,
+  logoutUserSessions
+};

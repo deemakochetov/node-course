@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
@@ -43,6 +44,13 @@ const UserSchema = new mongoose.Schema({
     }
   ]
 });
+
+UserSchema.methods.toJSON = function () {
+  const privateFields = ['password', 'tokens'];
+  const user = this.toObject();
+  privateFields.forEach((field) => delete user[field]);
+  return user;
+};
 
 UserSchema.methods.generateAuthToken = async function () {
   const user = this;

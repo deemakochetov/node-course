@@ -17,6 +17,9 @@ module.exports = {
     'no-restricted-syntax': ['error', 'LabeledStatement', 'WithStatement'],
     'no-plusplus': 'off',
     'no-use-before-define': ['error', { functions: false, classes: false }],
-    'no-param-reassign': 0
+    'no-param-reassign': 0,
+    'no-underscore-dangle': ['error', { allow: ['_id'] }],
+    'consistent-return': 'off',
+    'func-names': ['error', 'never']
   }
 };
