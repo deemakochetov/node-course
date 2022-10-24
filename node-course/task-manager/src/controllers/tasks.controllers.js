@@ -41,9 +41,11 @@ const getAllTasks = async (req, res) => {
 
 const getTask = async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id);
+    const task = await Task.findOne({
+      _id: req.params.id,
+      owner: req.user._id
+    });
     if (!task) res.status(StatusCodes.NOT_FOUND).send();
-    if (task.owner !== req.user._id) res.status(StatusCodes.FORBIDDEN).send();
     else res.send(task);
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send(err);
@@ -54,12 +56,14 @@ const updateTask = async (req, res) => {
   const allowedUpdates = ['description', 'completed'];
 
   try {
-    const task = await Task.findById(req.params.id);
+    const task = await Task.findOne({
+      _id: req.params.id,
+      owner: req.user._id
+    });
     if (!task) {
       res.status(StatusCodes.NOT_FOUND).send();
       return;
     }
-    if (task.owner !== req.user._id) res.status(StatusCodes.FORBIDDEN).send();
     for (const [key, value] of Object.entries(req.body)) {
       if (allowedUpdates.includes(key)) task[key] = value;
       else
