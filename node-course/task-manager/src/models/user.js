@@ -44,7 +44,10 @@ const UserSchema = new mongoose.Schema(
           require: true
         }
       }
-    ]
+    ],
+    avatar: {
+      type: Buffer
+    }
   },
   {
     timestamps: true
@@ -58,7 +61,7 @@ const UserSchema = new mongoose.Schema(
 // });
 
 UserSchema.methods.toJSON = function () {
-  const privateFields = ['password', 'tokens'];
+  const privateFields = ['password', 'tokens', 'avatar'];
   const user = this.toObject();
   privateFields.forEach((field) => delete user[field]);
   return user;

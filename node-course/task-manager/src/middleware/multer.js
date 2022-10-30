@@ -2,18 +2,14 @@ const multer = require('multer');
 
 const MEGABYTE = 1000000;
 const MAX_IMAGE_SIZE = 1 * MEGABYTE;
+const ALLOWED_EXTENSIONS = /^(image\/jpg|image\/jpeg|image\/png)$/;
 
 const upload = multer({
-  dest: 'uploads/',
   limits: {
     fileSize: MAX_IMAGE_SIZE
   },
   fileFilter(req, file, cb) {
-    if (
-      file.mimetype === 'image/png' ||
-      file.mimetype === 'image/jpg' ||
-      file.mimetype === 'image/jpeg'
-    ) {
+    if (ALLOWED_EXTENSIONS.test(file.mimetype)) {
       cb(null, true);
     } else {
       cb(null, false);

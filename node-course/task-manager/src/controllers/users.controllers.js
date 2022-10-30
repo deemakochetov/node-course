@@ -94,8 +94,37 @@ const logoutUserSessions = async (req, res) => {
   }
 };
 
-const uploadImage = async (req, res) => {
+const getAvatar = async (req, res) => {
   try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user || !user.avatar) {
+      throw new Error('Cannot fetch avatar of the user');
+    }
+
+    res.set('Content-Type', 'image/jpg');
+    res.send(user.avatar);
+  } catch (err) {
+    res.status(StatusCodes.NOT_FOUND).send(err);
+  }
+};
+
+const uploadAvatar = async (req, res) => {
+  try {
+    const { user, file } = req;
+    user.avatar = file.buffer;
+    await user.save();
+    res.send();
+  } catch (err) {
+    res.status(StatusCodes.BAD_REQUEST).send({ error: err.message });
+  }
+};
+
+const deleteAvatar = async (req, res) => {
+  try {
+    const { user } = req;
+    user.avatar = undefined;
+    await user.save();
     res.send();
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send(err);
@@ -110,5 +139,7 @@ module.exports = {
   updateUser,
   logoutUser,
   logoutUserSessions,
-  uploadImage
+  getAvatar,
+  uploadAvatar,
+  deleteAvatar
 };

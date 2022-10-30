@@ -6,6 +6,7 @@ const usersRouter = require('./src/routes/users.routes');
 const tasksRouter = require('./src/routes/tasks.routes');
 const authRouter = require('./src/routes/auth.routes');
 const authMiddleware = require('./src/middleware/auth');
+const { StatusCodes } = require('http-status-codes');
 // if (process.env.NODE_ENV !== 'production') {
 require('dotenv').config({ path: `${__dirname}/.env` });
 // }
@@ -19,9 +20,13 @@ app.use('/', authRouter);
 
 app.use(authMiddleware);
 
-app.use('/profile', usersRouter);
+app.use('/users', usersRouter);
 app.use('/tasks', tasksRouter);
 
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(StatusCodes.BAD_REQUEST).send({ error: err.message });
+});
 app.listen(port, () => {
   logSuccess(`Listening on port ${port}`);
 });

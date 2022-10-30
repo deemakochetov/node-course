@@ -6,16 +6,20 @@ const {
   updateUser,
   logoutUser,
   logoutUserSessions,
-  uploadImage
+  getAvatar,
+  uploadAvatar,
+  deleteAvatar
 } = require('../controllers/users.controllers');
 
 const router = express.Router();
 
-router.get('', getUser);
-router.patch('', updateUser);
-router.delete('', deleteUser);
-router.post('/logout', logoutUser);
-router.post('/logout-all-sessions', logoutUserSessions);
-router.post('/upload-avatar', upload.single('avatar'), uploadImage);
+router.get('/me', getUser);
+router.patch('/me', updateUser);
+router.delete('/me', deleteUser);
+router.post('/me/logout', logoutUser);
+router.post('/me/logout-all-sessions', logoutUserSessions);
+router.get('/:id/avatar', getAvatar);
+router.put('/me/avatar', upload.single('avatar'), uploadAvatar);
+router.delete('/me/avatar', deleteAvatar);
 
 module.exports = router;
