@@ -25,6 +25,16 @@ const createTask = async (req, res) => {
 
 const getAllTasks = async (req, res) => {
   try {
+    const limit = parseInt(req.query.limit, 10);
+    const skip = parseInt(req.query.skip, 10);
+    const sortingOptions = {};
+    if (req.query.sortBy) {
+      // eslint-disable-next-line prefer-const
+      let [sortParameter, order] = req.query.sortBy.split('_');
+      if (order === 'asc') order = 1;
+      if (order === 'desc') order = -1;
+      sortingOptions[sortParameter] = order;
+    }
     let searchQuery = {};
     if (req.query.completed) {
       searchQuery = {
@@ -32,7 +42,10 @@ const getAllTasks = async (req, res) => {
       };
     }
     searchQuery.owner = req.user._id;
-    const tasks = await Task.find(searchQuery);
+    const tasks = await Task.find(searchQuery)
+      .sort(sortingOptions)
+      .limit(limit)
+      .skip(skip);
     res.send(tasks);
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send(err);

@@ -3,47 +3,53 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Task = require('./task');
 
-const UserSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  email: {
-    type: String,
-    unique: true,
-    trim: true,
-    required: true,
-    validate(value) {
-      if (!validator.isEmail(value)) throw new Error('An email is invalid');
-    }
-  },
-  age: {
-    type: Number,
-    default: 0,
-    validate(value) {
-      if (value < 0) throw new Error('Age must be a positive number');
-    }
-  },
-  password: {
-    type: String,
-    trim: true,
-    minlength: [7, 'The password is too short'],
-    validate(value) {
-      if (value.toLowerCase().includes('password'))
-        throw new Error(`Password should not contain word 'password'`);
-    }
-  },
-  tokens: [
-    {
-      token: {
-        type: String,
-        require: true
+const UserSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    email: {
+      type: String,
+      unique: true,
+      trim: true,
+      required: true,
+      validate(value) {
+        if (!validator.isEmail(value)) throw new Error('An email is invalid');
       }
-    }
-  ]
-});
+    },
+    age: {
+      type: Number,
+      default: 0,
+      validate(value) {
+        if (value < 0) throw new Error('Age must be a positive number');
+      }
+    },
+    password: {
+      type: String,
+      trim: true,
+      minlength: [7, 'The password is too short'],
+      validate(value) {
+        if (value.toLowerCase().includes('password'))
+          throw new Error(`Password should not contain word 'password'`);
+      }
+    },
+    tokens: [
+      {
+        token: {
+          type: String,
+          require: true
+        }
+      }
+    ]
+  },
+  {
+    timestamps: true
+  }
+);
 
 // UserSchema.virtual('tasks', {
 //   ref: 'Task',
@@ -84,6 +90,14 @@ UserSchema.pre('save', async function (next) {
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
   }
+  next();
+});
+
+UserSchema.pre('remove', async function (next) {
+  const user = this;
+
+  await Task.deleteMany({ owner: user._id });
+
   next();
 });
 

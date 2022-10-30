@@ -94,6 +94,14 @@ const logoutUserSessions = async (req, res) => {
   }
 };
 
+const uploadImage = async (req, res) => {
+  try {
+    res.send();
+  } catch (err) {
+    res.status(StatusCodes.BAD_REQUEST).send(err);
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
@@ -101,5 +109,6 @@ module.exports = {
   deleteUser,
   updateUser,
   logoutUser,
-  logoutUserSessions
+  logoutUserSessions,
+  uploadImage
 };
