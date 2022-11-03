@@ -1,6 +1,14 @@
 const { StatusCodes } = require('http-status-codes');
-
+const sharp = require('sharp');
+// const config = require('config');
 const User = require('../models/user');
+const sendEmail = require('../utils/sendEmail');
+
+const REGISTRATION_REASON = 'registration';
+const LEAVING_REASON = 'deletingAccount';
+
+const AVATAR_HEIGHT = 250;
+const AVATAR_WIDTH = 250;
 
 const createUser = async (req, res) => {
   const allowedFields = ['name', 'age', 'email', 'password'];
@@ -15,6 +23,7 @@ const createUser = async (req, res) => {
     }
     const user = new User(queryObject);
     await user.save();
+    //    sendEmail(user.email, user.name, REGISTRATION_REASON);
     const token = await user.generateAuthToken();
     res.status(StatusCodes.CREATED).send({ user, token });
   } catch (err) {
@@ -45,9 +54,12 @@ const getUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   try {
-    const result = await User.deleteOne(req.user);
-    if (result.deletedCount === 0) res.status(StatusCodes.NOT_FOUND).send();
-    else res.send();
+    const user = await User.deleteOne(req.user);
+    if (user.deletedCount === 0) res.status(StatusCodes.NOT_FOUND).send();
+    else {
+      // sendEmail(user.email, user.name, LEAVING_REASON);
+      res.send();
+    }
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send(err);
   }
@@ -102,7 +114,7 @@ const getAvatar = async (req, res) => {
       throw new Error('Cannot fetch avatar of the user');
     }
 
-    res.set('Content-Type', 'image/jpg');
+    res.set('Content-Type', 'image/png');
     res.send(user.avatar);
   } catch (err) {
     res.status(StatusCodes.NOT_FOUND).send(err);
@@ -112,7 +124,11 @@ const getAvatar = async (req, res) => {
 const uploadAvatar = async (req, res) => {
   try {
     const { user, file } = req;
-    user.avatar = file.buffer;
+    const buffer = await sharp(file.buffer)
+      .resize({ width: AVATAR_WIDTH, height: AVATAR_HEIGHT })
+      .png()
+      .toBuffer();
+    user.avatar = buffer;
     await user.save();
     res.send();
   } catch (err) {

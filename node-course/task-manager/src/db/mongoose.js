@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
+const config = require('config');
 
-const CONNECTION_URL = 'mongodb://127.0.0.1:27017/task-manager-api';
+const CONNECTION_URL = config.get('dbConfig.connnection_url');
 
 mongoose.connect(CONNECTION_URL, {});
